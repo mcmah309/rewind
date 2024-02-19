@@ -1,7 +1,7 @@
 name: anyhow_logging
 description: Logging utilities for the anyhow package.
-version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+version: 0.0.1
+repository: https://github.com/mcmah309/anyhow_logging
 
 environment:
   sdk: ^3.2.0
