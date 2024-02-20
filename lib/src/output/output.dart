@@ -6,6 +6,8 @@ import 'dart:async';
 /// This can be an output stream, a file or a network target. [LogOutput] may
 /// cache multiple log messages.
 abstract class LogOutput {
+  const LogOutput();
+
   Future<void> init() async {}
 
   void output(Output output);

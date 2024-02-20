@@ -3,8 +3,6 @@ import 'dart:io';
 
 import 'output.dart';
 
-
-
 /// Writes the log output to a file.
 class FileOutput extends LogOutput {
   final File file;

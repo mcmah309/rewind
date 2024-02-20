@@ -10,7 +10,7 @@ class MemoryOutput extends LogOutput {
   /// A secondary [LogOutput] to also received events.
   final LogOutput? secondOutput;
 
-  /// The buffer of events.
+  /// The buffer of output.
   final ListQueue<Output> buffer;
 
   MemoryOutput({this.bufferSize = 20, this.secondOutput})

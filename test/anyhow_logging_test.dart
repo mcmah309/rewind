@@ -7,9 +7,27 @@ import 'package:test/test.dart';
 void main() {
   late void Function() logFn;
 
-  test('test', () {
+  test('test1', () {
     final current = StackTrace.current;
     logFn = () => Log.i('test', messageOverride: 'override', messageAppend: 'append', objStackTrace: current);
+    func(logFn, 4);
+  });
+
+  test('test2', () {
+    final current = StackTrace.current;
+    logFn = () => Log.i('test', messageAppend: 'append', objStackTrace: current);
+    func(logFn, 4);
+  });
+
+  test('test3', () {
+    final current = StackTrace.current;
+    logFn = () => Log.i('test', objStackTrace: current);
+    func(logFn, 4);
+  });
+
+  test('test4', () {
+    final current = StackTrace.current;
+    logFn = () => Log.i('test');
     func(logFn, 4);
   });
 }
