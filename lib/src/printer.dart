@@ -103,8 +103,8 @@ class Printer {
 
     var emoji = _getEmoji(level);
     for (var entry in entries) {
-      buffer
-          .add('${color('$verticalLineAtLevel$emoji${entry.header}')}${entry.headerMessage ?? ''}');
+      buffer.add(
+          '${color('$verticalLineAtLevel$emoji${entry.header}')}${entry.headerMessage ?? ''}');
       if (entry.message != null) {
         for (var line in entry.message!.split("\n")) {
           buffer.add('${color(verticalLineAtLevel)}\t$line');

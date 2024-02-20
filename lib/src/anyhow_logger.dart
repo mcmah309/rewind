@@ -5,10 +5,8 @@ import 'package:anyhow/anyhow.dart' as anyhow;
 import 'package:stack_trace/stack_trace.dart';
 import 'package:uuid/uuid.dart';
 
-import 'ansi_color.dart';
 import 'level.dart';
 import 'logging_config.dart';
-import 'output/console_output.dart';
 import 'output/output.dart';
 import 'printer.dart';
 
@@ -39,12 +37,14 @@ class Log {
   //************************************************************************//
 
   /// If called, will set up prod logging with the provided parameters. If not called, it will be called with defaults when run in debug mode.
-  static setDevLoggingConfig([LoggingConfig devLoggingConfig = const LoggingConfig.devImpl()]) {
+  static setDevLoggingConfig(
+      [LoggingConfig devLoggingConfig = const LoggingConfig.devImpl()]) {
     _devLoggingConfig = devLoggingConfig;
   }
 
   /// If called, will set up prod logging with the provided parameters. If not called, it will be called with defaults when not run in non-debug mode.
-  static setProdLoggingConfig([LoggingConfig prodLoggingConfig = const LoggingConfig.prodImpl()]) {
+  static setProdLoggingConfig(
+      [LoggingConfig prodLoggingConfig = const LoggingConfig.prodImpl()]) {
     _prodLoggingConfig = prodLoggingConfig;
   }
 
@@ -54,10 +54,10 @@ class Log {
   static setLoggingConfig(LoggingConfig loggingConfig) {
     _levelValue = loggingConfig.level;
     _willCreateLogId = loggingConfig.willCreateLogId;
-    _stackTraceModifier = (s) =>
-        _modifyStackTrace(s, numberOfFramesToKeep: loggingConfig.methodCount, startOffset: 0);
-    anyhow.Error.stackTraceDisplayModifier = (s) =>
-        _modifyStackTrace(s, numberOfFramesToKeep: loggingConfig.methodCount, startOffset: 1);
+    _stackTraceModifier = (s) => _modifyStackTrace(s,
+        numberOfFramesToKeep: loggingConfig.methodCount, startOffset: 0);
+    anyhow.Error.stackTraceDisplayModifier = (s) => _modifyStackTrace(s,
+        numberOfFramesToKeep: loggingConfig.methodCount, startOffset: 1);
     _numberOfFramesToKeep = loggingConfig.methodCount;
     _timeFn = switch (loggingConfig.timeType) {
       LoggingTimeType.local => () => DateTime.now(),
@@ -71,7 +71,8 @@ class Log {
     );
     _output = loggingConfig.output;
     _onLog = loggingConfig.onLog;
-    _willCreateStackTraceForLogPoint = loggingConfig.willCreateStackTraceForLogPoint;
+    _willCreateStackTraceForLogPoint =
+        loggingConfig.willCreateStackTraceForLogPoint;
   }
 
   static Level get _level {
@@ -106,7 +107,8 @@ class Log {
   /// @param [append], appends the message on a new line to message from obj or messageOverride
   /// @param [objStackTrace], stacktrace associated with the [obj]. If [obj] is already an [Error], [anyhow.Err<anyhow.Error>], or [anyhow.Error] the stacktrace is already taken by default.
   /// {@endtemplate}
-  static void d(obj, {String? override, String? append, StackTrace? objStackTrace}) {
+  static void d(obj,
+      {String? override, String? append, StackTrace? objStackTrace}) {
     if (_level.value <= Level.debug.value) {
       return _applyObjToLog(Level.debug, obj, override, append, objStackTrace);
     }
@@ -115,34 +117,50 @@ class Log {
   /// info. See class description on how to use logging levels correctly.
   ///
   /// {@macro Logging.levelParams}
-  static void i(obj, {String? messageOverride, String? messageAppend, StackTrace? objStackTrace}) {
+  static void i(obj,
+      {String? messageOverride,
+      String? messageAppend,
+      StackTrace? objStackTrace}) {
     if (_level.value <= Level.info.value) {
-      return _applyObjToLog(Level.info, obj, messageOverride, messageAppend, objStackTrace);
+      return _applyObjToLog(
+          Level.info, obj, messageOverride, messageAppend, objStackTrace);
     }
   }
 
   /// warning. See class description on how to use logging levels correctly.
   ///
   /// {@macro Logging.levelParams}
-  static void w(obj, {String? messageOverride, String? messageAppend, StackTrace? objStackTrace}) {
+  static void w(obj,
+      {String? messageOverride,
+      String? messageAppend,
+      StackTrace? objStackTrace}) {
     if (_level.value <= Level.warning.value) {
-      return _applyObjToLog(Level.warning, obj, messageOverride, messageAppend, objStackTrace);
+      return _applyObjToLog(
+          Level.warning, obj, messageOverride, messageAppend, objStackTrace);
     }
   }
 
   /// error. See class description on how to use logging levels correctly.
   ///
   /// {@macro Logging.levelParams}
-  static void e(obj, {String? messageOverride, String? messageAppend, StackTrace? objStackTrace}) {
+  static void e(obj,
+      {String? messageOverride,
+      String? messageAppend,
+      StackTrace? objStackTrace}) {
     if (_level.value <= Level.error.value) {
-      return _applyObjToLog(Level.error, obj, messageOverride, messageAppend, objStackTrace);
+      return _applyObjToLog(
+          Level.error, obj, messageOverride, messageAppend, objStackTrace);
     }
   }
 
   //************************************************************************//
 
-  static void _applyObjToLog(Level level, Object objToLog, String? messageOverride,
-      String? messageAppend, StackTrace? objStackTrace) {
+  static void _applyObjToLog(
+      Level level,
+      Object objToLog,
+      String? messageOverride,
+      String? messageAppend,
+      StackTrace? objStackTrace) {
     final time = _timeFn!();
 
     if (objToLog is _LazyFunction) {
@@ -153,16 +171,18 @@ class Log {
       objToLog = encoder.convert(objToLog);
     }
     List<Entry> entries = [];
-    entries.add(
-        Entry("Object Type: ", EntryType.objectType, headerMessage: "${objToLog.runtimeType}"));
+    entries.add(Entry("Object Type: ", EntryType.objectType,
+        headerMessage: "${objToLog.runtimeType}"));
     if (messageOverride == null) {
-      entries.add(Entry("Stringified:", EntryType.stringified, message: objToLog.toString()));
+      entries.add(Entry("Stringified:", EntryType.stringified,
+          message: objToLog.toString()));
     } else {
-      entries.add(
-          Entry("Stringified Override:", EntryType.stringifiedOverride, message: messageOverride));
+      entries.add(Entry("Stringified Override:", EntryType.stringifiedOverride,
+          message: messageOverride));
     }
     if (messageAppend != null) {
-      entries.add(Entry("Appended Message:", EntryType.appendedMessage, message: messageAppend));
+      entries.add(Entry("Appended Message:", EntryType.appendedMessage,
+          message: messageAppend));
     }
     String? id;
     if (_willCreateLogId) {
@@ -184,8 +204,10 @@ class Log {
       switch (objToLog) {
         case Error(): // Could be a panic too
           if (objToLog.stackTrace != null) {
-            objStackTrace = _stackTraceModifier(objToLog.stackTrace!); //todo maybe modify
-            entries.add(Entry("Object's StackTrace:", EntryType.objectStackTrace,
+            objStackTrace =
+                _stackTraceModifier(objToLog.stackTrace!); //todo maybe modify
+            entries.add(Entry(
+                "Object's StackTrace:", EntryType.objectStackTrace,
                 message: objStackTrace.toString()));
           }
           break;
@@ -232,7 +254,8 @@ StackTrace _modifyStackTrace(StackTrace stackTrace,
   List<Frame> frames = trace.frames;
   List<Frame> newFrames = [];
   if (numberOfFramesToKeep != null) {
-    numberOfFramesToKeep = min(numberOfFramesToKeep + startOffset, frames.length);
+    numberOfFramesToKeep =
+        min(numberOfFramesToKeep + startOffset, frames.length);
   } else {
     numberOfFramesToKeep = frames.length;
   }

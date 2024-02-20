@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:anyhow/anyhow.dart';
 import 'package:anyhow_logging/anyhow_logging.dart';
 import 'package:test/test.dart';
@@ -9,14 +7,17 @@ void main() {
 
   test('test1', () {
     final current = StackTrace.current;
-    logFn = () =>
-        Log.i('test', messageOverride: 'override', messageAppend: 'append', objStackTrace: current);
+    logFn = () => Log.i('test',
+        messageOverride: 'override',
+        messageAppend: 'append',
+        objStackTrace: current);
     func(logFn, 4);
   });
 
   test('test2', () {
     final current = StackTrace.current;
-    logFn = () => Log.i('test', messageAppend: 'append', objStackTrace: current);
+    logFn =
+        () => Log.i('test', messageAppend: 'append', objStackTrace: current);
     func(logFn, 4);
   });
 
@@ -48,7 +49,7 @@ void main() {
     func(logFn, 9);
   });
 
-    test('test-anyhow4', () {
+  test('test-anyhow4', () {
     Error.stackTraceDisplayFormat = StackTraceDisplayFormat.full;
     logFn = () => Log.i(bail("bailing here").context("this is some context"));
     func(logFn, 9);
@@ -56,7 +57,9 @@ void main() {
 
   test('test-anyhow5', () {
     Error.stackTraceDisplayFormat = StackTraceDisplayFormat.full;
-    logFn = () => Log.e(bail("bailing here").context("this is some context").context("How about some more"));
+    logFn = () => Log.e(bail("bailing here")
+        .context("this is some context")
+        .context("How about some more"));
     func(logFn, 8);
   });
 }
