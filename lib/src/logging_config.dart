@@ -24,6 +24,8 @@ class LoggingConfig {
   final bool willPrintEmojis;
   /// Whether to box the output. Defaults to true in dev mode and false in prod mode.
   final bool willBoxOuput;
+  /// Whether to create a stack trace for log points. Defaults to true in dev mode and false in prod mode.
+  final bool willCreateStackTraceForLogPoint;
   /// If provided, will be called with the processed log item, the log level, and the log id. Useful for sending logs to a server
   final void Function({List<Entry> entries, Level level, String? id})? onLog;
 
@@ -37,6 +39,7 @@ class LoggingConfig {
       required this.lineLength,
       required this.willPrintEmojis,
       required this.willBoxOuput,
+      required this.willCreateStackTraceForLogPoint,
       required this.onLog});
 
   const LoggingConfig.devImpl(
@@ -49,6 +52,7 @@ class LoggingConfig {
       this.lineLength = 120,
       this.willPrintEmojis = true,
       this.willBoxOuput = true,
+      this.willCreateStackTraceForLogPoint = true,
       this.onLog});
 
   const LoggingConfig.prodImpl(
@@ -61,6 +65,7 @@ class LoggingConfig {
       this.lineLength = 120,
       this.willPrintEmojis = false,
       this.willBoxOuput = false,
+      this.willCreateStackTraceForLogPoint = false,
       this.onLog});
 }
 

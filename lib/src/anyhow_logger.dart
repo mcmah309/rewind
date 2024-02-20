@@ -33,6 +33,8 @@ class Log {
   static late StackTrace Function(StackTrace) _stackTraceModifier;
   static late LogOutput _output;
   static void Function({List<Entry> entries, Level level, String? id})? _onLog;
+  static late int _numberOfFramesToKeep;
+  static late bool _willCreateStackTraceForLogPoint;
 
   //************************************************************************//
 
@@ -56,6 +58,7 @@ class Log {
         _modifyStackTrace(s, numberOfFramesToKeep: loggingConfig.methodCount, startOffset: 0);
     anyhow.Error.stackTraceDisplayModifier = (s) =>
         _modifyStackTrace(s, numberOfFramesToKeep: loggingConfig.methodCount, startOffset: 1);
+    _numberOfFramesToKeep = loggingConfig.methodCount;
     _timeFn = switch (loggingConfig.timeType) {
       LoggingTimeType.local => () => DateTime.now(),
       LoggingTimeType.utc => () => DateTime.now().toUtc()
@@ -68,6 +71,7 @@ class Log {
     );
     _output = loggingConfig.output;
     _onLog = loggingConfig.onLog;
+    _willCreateStackTraceForLogPoint = loggingConfig.willCreateStackTraceForLogPoint;
   }
 
   static Level get _level {
@@ -140,7 +144,6 @@ class Log {
   static void _applyObjToLog(Level level, Object objToLog, String? messageOverride,
       String? messageAppend, StackTrace? objStackTrace) {
     final time = _timeFn!();
-    final stackTraceFromLogPoint = _modifyStackTrace(StackTrace.current, startOffset: 2);
 
     if (objToLog is _LazyFunction) {
       objToLog = objToLog();
@@ -168,8 +171,12 @@ class Log {
     }
     entries.add(Entry("Time: ", EntryType.time,
         headerMessage: "$time  ${time.isUtc ? " (UTC)" : " (Local)"}"));
-    entries.add(Entry("Log-Point StackTrace:", EntryType.logPointStackTrace,
-        message: stackTraceFromLogPoint.toString()));
+    if (_willCreateStackTraceForLogPoint) {
+      final stackTraceFromLogPoint = _modifyStackTrace(StackTrace.current,
+          startOffset: 2, numberOfFramesToKeep: _numberOfFramesToKeep);
+      entries.add(Entry("Log-Point StackTrace:", EntryType.logPointStackTrace,
+          message: stackTraceFromLogPoint.toString()));
+    }
     if (objStackTrace != null) {
       entries.add(Entry("Object StackTrace:", EntryType.objectStackTrace,
           message: _stackTraceModifier(objStackTrace).toString()));
@@ -191,11 +198,6 @@ class Log {
 
     _onLog?.call(entries: entries, level: Level.debug, id: id);
     _output.output(Output(output));
-  }
-
-  // Handles any object that is causing JsonEncoder() problems
-  static Object _toEncodableFallback(dynamic object) {
-    return object.toString();
   }
 }
 
@@ -219,13 +221,18 @@ enum EntryType {
   objectStackTrace
 }
 
+// Handles any object that is causing JsonEncoder() problems
+Object _toEncodableFallback(dynamic object) {
+  return object.toString();
+}
+
 StackTrace _modifyStackTrace(StackTrace stackTrace,
     {int? numberOfFramesToKeep, int startOffset = 0}) {
   Trace trace = Trace.from(stackTrace);
   List<Frame> frames = trace.frames;
   List<Frame> newFrames = [];
   if (numberOfFramesToKeep != null) {
-    numberOfFramesToKeep = min(numberOfFramesToKeep, frames.length);
+    numberOfFramesToKeep = min(numberOfFramesToKeep + startOffset, frames.length);
   } else {
     numberOfFramesToKeep = frames.length;
   }
