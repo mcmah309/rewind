@@ -54,7 +54,7 @@ void main() {
     func(logFn, 9);
   });
 
-  test('test-anyhow4', () {
+  test('test-anyhow5', () {
     Error.stackTraceDisplayFormat = StackTraceDisplayFormat.full;
     logFn = () => Log.e(bail("bailing here").context("this is some context").context("How about some more"));
     func(logFn, 8);
