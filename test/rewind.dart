@@ -1,6 +1,6 @@
 import 'package:anyhow/anyhow.dart';
-import 'package:anyhow_logging/anyhow_logging.dart';
 import 'package:test/test.dart';
+import 'package:rewind/rewind.dart';
 
 void main() {
   late void Function() logFn;

@@ -1,1 +1,3 @@
-Logging utilities for the anyhow package
+Logging utility.
+
+TBD

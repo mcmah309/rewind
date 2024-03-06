@@ -1,5 +1,5 @@
-name: anyhow_logging
-description: Logging utilities for the anyhow package.
+name: rewind
+description: Logging utility.
 version: 0.1.0
 repository: https://github.com/mcmah309/anyhow_logging
 

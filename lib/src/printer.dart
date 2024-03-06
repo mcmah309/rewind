@@ -1,5 +1,5 @@
 import 'ansi_color.dart';
-import 'anyhow_logger.dart';
+import 'log.dart';
 import 'level.dart';
 
 /// [Printer] for output.
@@ -12,8 +12,8 @@ class Printer {
   static const singleDivider = '┄';
 
   static final Map<Level, AnsiColor> defaultLevelColors = {
-    Level.trace: AnsiColor.fg(AnsiColor.grey(0.5)),
-    Level.debug: const AnsiColor.none(),
+    Level.trace: AnsiColor.fg(AnsiColor.grey(164)),
+    Level.debug: const AnsiColor.fg(82),
     Level.info: const AnsiColor.fg(12),
     Level.warning: const AnsiColor.fg(208),
     Level.error: const AnsiColor.fg(196),

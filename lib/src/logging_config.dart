@@ -1,8 +1,7 @@
-import 'package:anyhow_logging/src/output/output.dart';
-
-import 'anyhow_logger.dart';
+import 'log.dart';
 import 'level.dart';
 import 'output/console_output.dart';
+import 'output/output.dart';
 
 class LoggingConfig {
   /// The level of the logger.
@@ -32,7 +31,7 @@ class LoggingConfig {
   /// Whether to box the output. Defaults to true in dev mode and false in prod mode.
   final bool willBoxOuput;
 
-  /// Whether to create a stack trace for log points. Defaults to true in dev mode and false in prod mode.
+  /// Whether to create a stack trace for log-points. A log-point is the point at which the object was logged. Defaults to true in dev mode and false in prod mode.
   final bool willCreateStackTraceForLogPoint;
 
   /// If provided, will be called with the processed log item, the log level, and the log id. Useful for sending logs to a server
