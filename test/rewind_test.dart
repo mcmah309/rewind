@@ -14,12 +14,12 @@ void main() {
   Log.warningLogConfig = LogLevelConfig(
     printer: PrettyPrinter(),
     components: [
-    StringifiedLogComponent(),
+    StringifiedComponent(),
   ]);
   Log.debugLogConfig = LogLevelConfig(
     printer: SimplePrinter(),
     components: [
-    StringifiedLogComponent(),
+    StringifiedComponent(),
   ]);
 
   late void Function() logFn;

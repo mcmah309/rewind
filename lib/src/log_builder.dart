@@ -21,11 +21,11 @@ class LogLevelConfig {
     this.framesToKeep = 6,
     this.onLog,
   })  : components = const [
-          ObjectTypeLogComponent(),
-          StringifiedLogComponent(),
+          ObjectTypeComponent(),
+          StringifiedComponent(),
           AppendLogComponent(),
-          IdLogComponent(),
-          TimeLogComponent(),
+          IdComponent(),
+          TimeComponent(),
           LogPointComponent(),
         ],
         _willCreateLogId = true,
@@ -71,8 +71,8 @@ abstract class LogComponent {
   LogField? build(LogEvent event);
 }
 
-class ObjectTypeLogComponent extends LogComponent {
-  const ObjectTypeLogComponent();
+class ObjectTypeComponent extends LogComponent {
+  const ObjectTypeComponent();
 
   @override
   LogField build(LogEvent event) {
@@ -87,10 +87,10 @@ class ObjectTypeLogComponent extends LogComponent {
   List<ToCapture> get toCapture => const [];
 }
 
-class StringifiedLogComponent extends LogComponent {
+class StringifiedComponent extends LogComponent {
   final int ifHasStacktraceKeep;
 
-  const StringifiedLogComponent({this.ifHasStacktraceKeep = 6});
+  const StringifiedComponent({this.ifHasStacktraceKeep = 6});
 
   @override
   LogField build(LogEvent event) {
@@ -124,8 +124,8 @@ class AppendLogComponent extends LogComponent {
   List<ToCapture> get toCapture => const [];
 }
 
-class IdLogComponent extends LogComponent {
-  const IdLogComponent();
+class IdComponent extends LogComponent {
+  const IdComponent();
 
   @override
   LogField build(LogEvent event) {
@@ -141,11 +141,11 @@ class IdLogComponent extends LogComponent {
 
 enum TimeZone { local, utc }
 
-class TimeLogComponent extends LogComponent {
+class TimeComponent extends LogComponent {
   final TimeZone time;
 
   // Dev Note: The time is always originally in UTC.
-  const TimeLogComponent([this.time = TimeZone.utc]);
+  const TimeComponent([this.time = TimeZone.utc]);
 
   @override
   LogField build(LogEvent event) {
