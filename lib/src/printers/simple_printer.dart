@@ -1,9 +1,4 @@
-import 'dart:convert';
-
-import 'package:rewind/src/log.dart';
-
-import 'level.dart';
-import 'printer.dart';
+part of "printer.dart";
 
 /// Outputs simple log messages:
 /// ```
@@ -22,13 +17,14 @@ class SimplePrinter implements Printer {
   const SimplePrinter();
 
   @override
-  List<String> format(Level level, List<OutputEntry> entries) {
+  List<String> format(Level level, List<LogField> entries, int? framesToKeep,) {
     List<String> buffer = [];
     var prefix = levelPrefixes[level]!;
     for (var entry in entries) {
       buffer.add('$prefix${entry.header}${entry.headerMessage ?? ''}');
       if (entry.body != null) {
-        for (var line in entry.body!.split("\n")) {
+        final String stringBody = _bodyToString(entry.body!, framesToKeep);
+        for (var line in stringBody.split("\n")) {
           buffer.add('\t$line');
         }
       }

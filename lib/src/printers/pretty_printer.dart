@@ -1,7 +1,4 @@
-import 'ansi_color.dart';
-import 'log.dart';
-import 'level.dart';
-import 'printer.dart';
+part of "printer.dart";
 
 /// [PrettyPrinter] for output.
 class PrettyPrinter implements Printer {
@@ -96,7 +93,8 @@ class PrettyPrinter implements Printer {
   @override
   List<String> format(
     Level level,
-    List<OutputEntry> entries,
+    List<LogField> entries,
+    int? framesToKeep,
   ) {
     List<String> buffer = [];
     var verticalLineAtLevel = willBoxOuput ? '$verticalLine ' : '';
@@ -108,7 +106,9 @@ class PrettyPrinter implements Printer {
       buffer.add(
           '${color('$verticalLineAtLevel$emoji${entry.header}: ')}${entry.headerMessage ?? ''}');
       if (entry.body != null) {
-        for (var line in entry.body!.split("\n")) {
+        var body = entry.body!;
+        final stringBody = _bodyToString(body, framesToKeep);
+        for (var line in stringBody.split("\n")) {
           buffer.add('${color(verticalLineAtLevel)}\t$line');
         }
       }
@@ -118,3 +118,5 @@ class PrettyPrinter implements Printer {
     return buffer;
   }
 }
+
+

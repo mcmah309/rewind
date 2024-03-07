@@ -8,15 +8,20 @@ final defaultLogConfig = LogLevelConfig.def(
 );
 
 class LogLevelConfig {
+  /// The level of the log.
   final Level level;
+  /// The printer to use to print the log.
   final Printer printer;
+  /// If stacktrace is encountered, the number of frames to keep. If null, the entire stacktrace is kept.
+  final int? framesToKeep;
+  /// The components to use to build the log.
   final List<LogComponent> components;
 
   bool _willCreateLogId = false;
   bool _willCaptureTime = false;
   bool _willCreateStackTraceForLogPoint = false;
 
-  LogLevelConfig.def(this.level, {this.printer = const SimplePrinter()})
+  LogLevelConfig.def(this.level, {this.printer = const SimplePrinter(), this.framesToKeep = 6})
       : components = const [
           ObjectTypeLogComponent(),
           StringifiedLogComponent(),
@@ -29,7 +34,7 @@ class LogLevelConfig {
         _willCaptureTime = true,
         _willCreateStackTraceForLogPoint = true;
 
-  LogLevelConfig(this.level, {this.printer = const SimplePrinter(), required this.components}) {
+  LogLevelConfig(this.level, {required this.components, this.printer = const SimplePrinter(), this.framesToKeep = 6}) {
     for (final component in components) {
       for (final toCapture in component.toCapture) {
         switch (toCapture) {
@@ -68,20 +73,21 @@ abstract class LogComponent {
 
   const LogComponent();
 
-  OutputEntry? build(LogEvent event);
+  LogField? build(LogEvent event);
 }
 
 class ObjectTypeLogComponent extends LogComponent {
   const ObjectTypeLogComponent();
 
   @override
-  OutputEntry build(LogEvent event) {
-    return OutputEntry(
+  LogField build(LogEvent event) {
+    return LogField(
       header: 'Object Type',
       headerMessage: event.obj.runtimeType.toString(),
     );
   }
 
+  /// Guarentees the [LogEvent] will have the [ToCapture] field.
   @override
   List<ToCapture> get toCapture => const [];
 }
@@ -92,10 +98,10 @@ class StringifiedLogComponent extends LogComponent {
   const StringifiedLogComponent({this.ifHasStacktraceKeep = 6});
 
   @override
-  OutputEntry build(LogEvent event) {
+  LogField build(LogEvent event) {
     final header = event.override == null ? 'Stringified' : 'Stringified Override';
-    final message = event.override ?? _objToString(event.obj, ifHasStacktraceKeep);
-    return OutputEntry(
+    final message = event.override ?? event.obj;
+    return LogField(
       header: header,
       body: message,
     );
@@ -109,11 +115,11 @@ class AppendLogComponent extends LogComponent {
   const AppendLogComponent();
 
   @override
-  OutputEntry? build(LogEvent event) {
+  LogField? build(LogEvent event) {
     if (event.append == null) {
       return null;
     }
-    return OutputEntry(
+    return LogField(
       header: 'Appended Message',
       headerMessage: event.append!,
     );
@@ -127,8 +133,8 @@ class IdLogComponent extends LogComponent {
   const IdLogComponent();
 
   @override
-  OutputEntry build(LogEvent event) {
-    return OutputEntry(
+  LogField build(LogEvent event) {
+    return LogField(
       header: 'Log ID',
       headerMessage: event.id!,
     );
@@ -147,8 +153,8 @@ class TimeLogComponent extends LogComponent {
   const TimeLogComponent([this.time = TimeZone.utc]);
 
   @override
-  OutputEntry build(LogEvent event) {
-    return OutputEntry(
+  LogField build(LogEvent event) {
+    return LogField(
         header: 'Log Time',
         headerMessage: switch (time) {
           TimeZone.local => event.time!.toLocal().toIso8601String(),
@@ -167,60 +173,13 @@ class LogPointComponent extends LogComponent {
   const LogPointComponent({this.framesToKeep = 6});
 
   @override
-  OutputEntry build(LogEvent event) {
-    return OutputEntry(
+  LogField build(LogEvent event) {
+    return LogField(
         header: 'Object StackTrace',
-        body: _modifyStackTrace(event.logPointStackTrace!,
-                numberOfFramesToKeep: framesToKeep, startOffset: 1)
-            .toString());
+        body: event.logPointStackTrace!,
+    );
   }
 
   @override
   List<ToCapture> get toCapture => const [ToCapture.logPoint];
-}
-
-StackTrace _modifyStackTrace(StackTrace stackTrace,
-    {int? numberOfFramesToKeep, int startOffset = 0}) {
-  Trace trace = Trace.from(stackTrace);
-  List<Frame> frames = trace.frames;
-  List<Frame> newFrames = [];
-  if (numberOfFramesToKeep != null) {
-    numberOfFramesToKeep = min(numberOfFramesToKeep + startOffset, frames.length);
-  } else {
-    numberOfFramesToKeep = frames.length;
-  }
-
-  for (int i = startOffset; i < numberOfFramesToKeep; i++) {
-    Frame f = frames[i];
-    newFrames.add(Frame(f.uri, f.line, f.column, f.member));
-  }
-
-  Trace newTrace = Trace(newFrames);
-  return newTrace;
-}
-
-String _objToString(Object obj, int ifHasStacktraceKeep) {
-  if (obj is Function()) {
-    obj = obj();
-  }
-  switch (obj) {
-    case Iterable():
-    case Map():
-      var encoder = JsonEncoder.withIndent('  ', _toEncodableFallback);
-      return encoder.convert(obj);
-    case Error():
-      if (obj.stackTrace != null) {
-        return _modifyStackTrace(obj.stackTrace!, numberOfFramesToKeep: ifHasStacktraceKeep)
-            .toString();
-      }
-      return obj.toString();
-    case anyhow.Err():
-      // todo
-      return obj.toString();
-    case anyhow.Error():
-      // todo
-      return obj.toString();
-    default:
-      return obj.toString();
-  }
 }

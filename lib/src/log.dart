@@ -3,15 +3,13 @@ import 'dart:math';
 
 import 'package:anyhow/anyhow.dart' as anyhow;
 import 'package:rewind/src/output/console_output.dart';
-import 'package:rewind/src/printer.dart';
+import 'package:rewind/src/printers/printer.dart';
 import 'package:rust_core/iter.dart';
 import 'package:stack_trace/stack_trace.dart';
 import 'package:uuid/uuid.dart';
 
 import 'level.dart';
 import 'output/output.dart';
-import 'pretty_printer.dart';
-import 'simple_printer.dart';
 
 part "log_builder.dart";
 
@@ -111,25 +109,27 @@ class Log {
     }
     StackTrace? logPointStackTrace;
     if(logConfig._willCreateStackTraceForLogPoint){
-      logPointStackTrace = _modifyStackTrace(StackTrace.current, startOffset: 2);
+      logPointStackTrace = StackTrace.current;
     }
     
     final logEvent = LogEvent(level, objToLog, messageOverride, messageAppend, time, logId, logPointStackTrace);
     //todo add callback
-    final outputEntries = logConfig.components.iter().map((e) => e.build(logEvent)).filter((e) => e != null).cast<OutputEntry>().toList();
+    final outputEntries = logConfig.components.iter().map((e) => e.build(logEvent)).filter((e) => e != null).cast<LogField>().toList();
 
-    final formatted = logConfig.printer.format(level, outputEntries);
+    final formatted = logConfig.printer.format(level, outputEntries, logConfig.framesToKeep);
 
     output.output(Output(formatted));
   }
 }
 
-class OutputEntry {
+/// A field of a log entry.
+class LogField {
   final String? header;
   final String? headerMessage;
-  final String? body;
+  /// Usually a string, but if not, the printer will handle it
+  final Object? body;
 
-  OutputEntry({this.header, this.headerMessage, this.body});
+  LogField({this.header, this.headerMessage, this.body});
 }
 
 class LogEvent {
@@ -151,21 +151,4 @@ enum LogFeature {
   logId,
   time,
   logPointStackTrace,
-}
-
-//todo remove
-enum EntryType {
-  objectType,
-  stringified,
-  stringifiedOverride,
-  appendedMessage,
-  logId,
-  time,
-  logPointStackTrace,
-  objectStackTrace
-}
-
-// Handles any object that is causing JsonEncoder() problems
-Object _toEncodableFallback(dynamic object) {
-  return object.toString();
 }
