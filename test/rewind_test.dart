@@ -8,8 +8,8 @@ void main() {
   test('test1', () {
     final current = StackTrace.current;
     logFn = () => Log.i('test',
-        messageOverride: 'override',
-        messageAppend: 'append',
+        override: 'override',
+        append: 'append',
         objStackTrace: current);
     func(logFn, 4);
   });
@@ -17,7 +17,7 @@ void main() {
   test('test2', () {
     final current = StackTrace.current;
     logFn =
-        () => Log.i('test', messageAppend: 'append', objStackTrace: current);
+        () => Log.i('test', append: 'append', objStackTrace: current);
     func(logFn, 4);
   });
 

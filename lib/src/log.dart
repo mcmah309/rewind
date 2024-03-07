@@ -2,13 +2,18 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:anyhow/anyhow.dart' as anyhow;
+import 'package:rewind/src/output/console_output.dart';
+import 'package:rewind/src/printer.dart';
+import 'package:rust_core/iter.dart';
 import 'package:stack_trace/stack_trace.dart';
 import 'package:uuid/uuid.dart';
 
 import 'level.dart';
-import 'logging_config.dart';
 import 'output/output.dart';
-import 'printer.dart';
+import 'pretty_printer.dart';
+import 'simple_printer.dart';
+
+part "log_builder.dart";
 
 /// FORMAT:
 /// Object Type
@@ -21,81 +26,15 @@ import 'printer.dart';
 class Log {
   Log._();
 
-  static late Printer _printer;
-  static Level? _levelValue;
-  static bool _willCreateLogId = true;
-  static final uuid = Uuid();
-  static DateTime Function()? _timeFn;
-  static LoggingConfig? _prodLoggingConfig;
-  static LoggingConfig? _devLoggingConfig;
-  static late StackTrace Function(StackTrace) _stackTraceModifier;
-  static late LogOutput _output;
-  static void Function({List<Entry> entries, Level level, String? id})? _onLog;
-  static late int _numberOfFramesToKeep;
-  static late bool _willCreateStackTraceForLogPoint;
+  static Level level = Level.info;
+  static LogOutput output = ConsoleOutput();
+  static LogLevelConfig debugLogConfig = defaultLogConfig;
+  static LogLevelConfig infoLogConfig = defaultLogConfig;
+  static LogLevelConfig warningLogConfig = defaultLogConfig;
+  static LogLevelConfig errorLogConfig = defaultLogConfig;
 
-  //************************************************************************//
+  static final _uuid = Uuid();
 
-  /// If called, will set up prod logging with the provided parameters. If not called, it will be called with defaults when run in debug mode.
-  static setDevLoggingConfig(
-      [LoggingConfig devLoggingConfig = const LoggingConfig.devImpl()]) {
-    _devLoggingConfig = devLoggingConfig;
-  }
-
-  /// If called, will set up prod logging with the provided parameters. If not called, it will be called with defaults when not run in non-debug mode.
-  static setProdLoggingConfig(
-      [LoggingConfig prodLoggingConfig = const LoggingConfig.prodImpl()]) {
-    _prodLoggingConfig = prodLoggingConfig;
-  }
-
-  /// If called, will set up all logging with the provided parameters. If not called, [LoggingConfig.devImpl] is
-  /// used in debug mode if [setDevLoggingConfig] is not called.
-  /// And [LoggingConfig.prodImpl] is used when in non-debug mode if [setProdLoggingConfig] is not called.
-  static setLoggingConfig(LoggingConfig loggingConfig) {
-    _levelValue = loggingConfig.level;
-    _willCreateLogId = loggingConfig.willCreateLogId;
-    _stackTraceModifier = (s) => _modifyStackTrace(s,
-        numberOfFramesToKeep: loggingConfig.methodCount, startOffset: 0);
-    anyhow.Error.stackTraceDisplayModifier = (s) => _modifyStackTrace(s,
-        numberOfFramesToKeep: loggingConfig.methodCount, startOffset: 1);
-    _numberOfFramesToKeep = loggingConfig.methodCount;
-    _timeFn = switch (loggingConfig.timeType) {
-      LoggingTimeType.local => () => DateTime.now(),
-      LoggingTimeType.utc => () => DateTime.now().toUtc()
-    };
-    _printer = Printer(
-      lineLength: loggingConfig.lineLength,
-      colors: loggingConfig.willUseColors,
-      printEmojis: loggingConfig.willPrintEmojis,
-      willBoxOuput: loggingConfig.willBoxOuput,
-    );
-    _output = loggingConfig.output;
-    _onLog = loggingConfig.onLog;
-    _willCreateStackTraceForLogPoint =
-        loggingConfig.willCreateStackTraceForLogPoint;
-  }
-
-  static Level get _level {
-    if (_levelValue != null) {
-      return _levelValue!;
-    }
-    assert(() {
-      if (_devLoggingConfig == null) {
-        setLoggingConfig(LoggingConfig.devImpl());
-      } else {
-        setLoggingConfig(_devLoggingConfig!);
-      }
-      return true;
-    }());
-    if (_levelValue == null) {
-      if (_prodLoggingConfig == null) {
-        setLoggingConfig(LoggingConfig.prodImpl());
-      } else {
-        setLoggingConfig(_prodLoggingConfig!);
-      }
-    }
-    return _levelValue!;
-  }
 
   //************************************************************************//
 
@@ -109,8 +48,8 @@ class Log {
   /// {@endtemplate}
   static void d(obj,
       {String? override, String? append, StackTrace? objStackTrace}) {
-    if (_level.value <= Level.debug.value) {
-      return _applyObjToLog(Level.debug, obj, override, append, objStackTrace);
+    if (level.value <= Level.debug.value) {
+      return _applyObjToLog(Level.debug, obj, override, append, debugLogConfig);
     }
   }
 
@@ -118,12 +57,12 @@ class Log {
   ///
   /// {@macro Logging.levelParams}
   static void i(obj,
-      {String? messageOverride,
-      String? messageAppend,
+      {String? override,
+      String? append,
       StackTrace? objStackTrace}) {
-    if (_level.value <= Level.info.value) {
+    if (level.value <= Level.info.value) {
       return _applyObjToLog(
-          Level.info, obj, messageOverride, messageAppend, objStackTrace);
+          Level.info, obj, override, append, infoLogConfig);
     }
   }
 
@@ -131,12 +70,12 @@ class Log {
   ///
   /// {@macro Logging.levelParams}
   static void w(obj,
-      {String? messageOverride,
-      String? messageAppend,
+      {String? override,
+      String? append,
       StackTrace? objStackTrace}) {
-    if (_level.value <= Level.warning.value) {
+    if (level.value <= Level.warning.value) {
       return _applyObjToLog(
-          Level.warning, obj, messageOverride, messageAppend, objStackTrace);
+          Level.warning, obj, override, append, warningLogConfig);
     }
   }
 
@@ -147,9 +86,9 @@ class Log {
       {String? messageOverride,
       String? messageAppend,
       StackTrace? objStackTrace}) {
-    if (_level.value <= Level.error.value) {
+    if (level.value <= Level.error.value) {
       return _applyObjToLog(
-          Level.error, obj, messageOverride, messageAppend, objStackTrace);
+          Level.error, obj, messageOverride, messageAppend, errorLogConfig);
     }
   }
 
@@ -160,78 +99,61 @@ class Log {
       Object objToLog,
       String? messageOverride,
       String? messageAppend,
-      StackTrace? objStackTrace) {
-    final time = _timeFn!();
+      LogLevelConfig logConfig) {
+    
+    String? logId;
+    if(logConfig._willCreateLogId){
+      logId = _uuid.v4();
+    }
+    DateTime? time;
+    if(logConfig._willCaptureTime){
+      time = DateTime.now().toUtc();
+    }
+    StackTrace? logPointStackTrace;
+    if(logConfig._willCreateStackTraceForLogPoint){
+      logPointStackTrace = _modifyStackTrace(StackTrace.current, startOffset: 2);
+    }
+    
+    final logEvent = LogEvent(level, objToLog, messageOverride, messageAppend, time, logId, logPointStackTrace);
+    //todo add callback
+    final outputEntries = logConfig.components.iter().map((e) => e.build(logEvent)).filter((e) => e != null).cast<OutputEntry>().toList();
 
-    if (objToLog is _LazyFunction) {
-      objToLog = objToLog();
-    }
-    if (objToLog is Map || objToLog is Iterable) {
-      var encoder = JsonEncoder.withIndent('  ', _toEncodableFallback);
-      objToLog = encoder.convert(objToLog);
-    }
-    List<Entry> entries = [];
-    entries.add(Entry("Object Type: ", EntryType.objectType,
-        headerMessage: "${objToLog.runtimeType}"));
-    if (messageOverride == null) {
-      entries.add(Entry("Stringified:", EntryType.stringified,
-          message: objToLog.toString()));
-    } else {
-      entries.add(Entry("Stringified Override:", EntryType.stringifiedOverride,
-          message: messageOverride));
-    }
-    if (messageAppend != null) {
-      entries.add(Entry("Appended Message:", EntryType.appendedMessage,
-          message: messageAppend));
-    }
-    String? id;
-    if (_willCreateLogId) {
-      id = uuid.v4();
-      entries.add(Entry("Log Id: ", EntryType.logId, headerMessage: id));
-    }
-    entries.add(Entry("Time: ", EntryType.time,
-        headerMessage: "$time  ${time.isUtc ? " (UTC)" : " (Local)"}"));
-    if (_willCreateStackTraceForLogPoint) {
-      final stackTraceFromLogPoint = _modifyStackTrace(StackTrace.current,
-          startOffset: 2, numberOfFramesToKeep: _numberOfFramesToKeep);
-      entries.add(Entry("Log-Point StackTrace:", EntryType.logPointStackTrace,
-          message: stackTraceFromLogPoint.toString()));
-    }
-    if (objStackTrace != null) {
-      entries.add(Entry("Object StackTrace:", EntryType.objectStackTrace,
-          message: _stackTraceModifier(objStackTrace).toString()));
-    } else {
-      switch (objToLog) {
-        case Error(): // Could be a panic too
-          if (objToLog.stackTrace != null) {
-            objStackTrace =
-                _stackTraceModifier(objToLog.stackTrace!); //todo maybe modify
-            entries.add(Entry(
-                "Object's StackTrace:", EntryType.objectStackTrace,
-                message: objStackTrace.toString()));
-          }
-          break;
-        default:
-          break;
-      }
-    }
+    final formatted = logConfig.printer.format(level, outputEntries);
 
-    final output = _printer.format(level, entries);
-
-    _onLog?.call(entries: entries, level: Level.debug, id: id);
-    _output.output(Output(output));
+    output.output(Output(formatted));
   }
 }
 
-class Entry {
-  final String header;
-  final EntryType type;
+class OutputEntry {
+  final String? header;
   final String? headerMessage;
-  final String? message;
+  final String? body;
 
-  Entry(this.header, this.type, {this.headerMessage, this.message});
+  OutputEntry({this.header, this.headerMessage, this.body});
 }
 
+class LogEvent {
+  final Level level;
+  final Object obj;
+  final String? override;
+  final String? append;
+  final DateTime? time;
+  final String? id;
+  final StackTrace? logPointStackTrace;
+
+  LogEvent(this.level, this.obj, this.override, this.append,
+      this.time, this.id, this.logPointStackTrace);
+
+}
+
+
+enum LogFeature {
+  logId,
+  time,
+  logPointStackTrace,
+}
+
+//todo remove
 enum EntryType {
   objectType,
   stringified,
@@ -247,26 +169,3 @@ enum EntryType {
 Object _toEncodableFallback(dynamic object) {
   return object.toString();
 }
-
-StackTrace _modifyStackTrace(StackTrace stackTrace,
-    {int? numberOfFramesToKeep, int startOffset = 0}) {
-  Trace trace = Trace.from(stackTrace);
-  List<Frame> frames = trace.frames;
-  List<Frame> newFrames = [];
-  if (numberOfFramesToKeep != null) {
-    numberOfFramesToKeep =
-        min(numberOfFramesToKeep + startOffset, frames.length);
-  } else {
-    numberOfFramesToKeep = frames.length;
-  }
-
-  for (int i = startOffset; i < numberOfFramesToKeep; i++) {
-    Frame f = frames[i];
-    newFrames.add(Frame(f.uri, f.line, f.column, f.member));
-  }
-
-  Trace newTrace = Trace(newFrames);
-  return newTrace;
-}
-
-typedef _LazyFunction = Object Function();

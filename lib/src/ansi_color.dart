@@ -1,4 +1,4 @@
-/// This class handles colorizing of terminal output.
+/// This class handles colorizing of terminal output. 
 class AnsiColor {
   /// ANSI Control Sequence Introducer, signals the terminal for new settings.
   static const ansiEsc = '\x1B[';
@@ -6,46 +6,28 @@ class AnsiColor {
   /// Reset all colors and options for current SGRs to terminal defaults.
   static const ansiDefault = '${ansiEsc}0m';
 
-  final int? fg;
-  final int? bg;
-  final bool color;
+  final int? code;
 
   const AnsiColor.none()
-      : fg = null,
-        bg = null,
-        color = false;
+      : code = null;
 
-  const AnsiColor.fg(this.fg)
-      : bg = null,
-        color = true;
-
-  const AnsiColor.bg(this.bg)
-      : fg = null,
-        color = true;
+  const AnsiColor(this.code);
 
   @override
   String toString() {
-    if (fg != null) {
-      return '${ansiEsc}38;5;${fg}m';
-    } else if (bg != null) {
-      return '${ansiEsc}48;5;${bg}m';
-    } else {
-      return '';
+    if (code != null) {
+      return '${ansiEsc}38;5;${code}m'; // foreground
+      // return '${ansiEsc}48;5;${bg}m'; // background
     }
+    return "";
   }
 
   String call(String msg) {
-    if (color) {
+    if (code != null) {
       // ignore: unnecessary_brace_in_string_interps
       return '${this}$msg$ansiDefault';
     } else {
       return msg;
     }
   }
-
-  AnsiColor toFg() => AnsiColor.fg(bg);
-
-  AnsiColor toBg() => AnsiColor.bg(fg);
-
-  static int grey(double level) => 232 + (level.clamp(0.0, 1.0) * 23).round();
 }
