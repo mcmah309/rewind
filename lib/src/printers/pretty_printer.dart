@@ -10,12 +10,12 @@ class PrettyPrinter implements Printer {
   static const singleDivider = '┄';
 
   static final Map<Level, String> defaultLevelEmojis = {
-    //Level.trace: '',
+    Level.trace: '',
     Level.debug: '🐛',
     Level.info: '💡',
     Level.warning: '⚠️',
     Level.error: '⛔',
-    //Level.fatal: '👾',
+    Level.fatal: '👾',
   };
 
   static final Map<Level, AnsiColor> defaultLevelColors = {
@@ -102,14 +102,26 @@ class PrettyPrinter implements Printer {
     if (willBoxOuput) buffer.add(color(_topBorder));
 
     var emoji = _getEmoji(level);
-    for (var entry in entries) {
-      buffer.add(
-          '${color('$verticalLineAtLevel$emoji${entry.header}: ')}${entry.headerMessage ?? ''}');
+    if (entries.length == 1) {
+      final entry = entries.first;
+      buffer.add(color('$verticalLineAtLevel$emoji'));
       if (entry.body != null) {
         var body = entry.body!;
         final stringBody = _bodyToString(body, framesToKeep);
         for (var line in stringBody.split("\n")) {
           buffer.add('${color(verticalLineAtLevel)}\t$line');
+        }
+      }
+    } else {
+      for (var entry in entries) {
+        buffer.add(
+            '${color('$verticalLineAtLevel$emoji${entry.header}: ')}${entry.headerMessage ?? ''}');
+        if (entry.body != null) {
+          var body = entry.body!;
+          final stringBody = _bodyToString(body, framesToKeep);
+          for (var line in stringBody.split("\n")) {
+            buffer.add('${color(verticalLineAtLevel)}\t$line');
+          }
         }
       }
     }
@@ -118,5 +130,3 @@ class PrettyPrinter implements Printer {
     return buffer;
   }
 }
-
-

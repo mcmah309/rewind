@@ -3,27 +3,42 @@ import 'package:test/test.dart';
 import 'package:rewind/rewind.dart';
 
 void main() {
+
+  Log.level = Level.trace;
+  Log.defaultLogConfig = LogLevelConfig.def(
+    printer: SimplePrinter()
+  );
+  Log.errorLogConfig = LogLevelConfig.def(
+    printer: PrettyPrinter()
+  );
+  Log.warningLogConfig = LogLevelConfig(
+    printer: PrettyPrinter(),
+    components: [
+    StringifiedLogComponent(),
+  ]);
+  Log.debugLogConfig = LogLevelConfig(
+    printer: SimplePrinter(),
+    components: [
+    StringifiedLogComponent(),
+  ]);
+
   late void Function() logFn;
 
   test('test1', () {
-    final current = StackTrace.current;
-    logFn = () => Log.i('test',
+    logFn = () => Log.t('test',
         override: 'override',
-        append: 'append',
-        objStackTrace: current);
+        append: 'append');
     func(logFn, 4);
   });
 
   test('test2', () {
-    final current = StackTrace.current;
     logFn =
-        () => Log.i('test', append: 'append', objStackTrace: current);
+        () => Log.i('test', append: 'append');
     func(logFn, 4);
   });
 
   test('test3', () {
-    final current = StackTrace.current;
-    logFn = () => Log.i('test', objStackTrace: current);
+    logFn = () => Log.i('test');
     func(logFn, 4);
   });
 
@@ -33,19 +48,18 @@ void main() {
   });
 
   test('test-anyhow1', () {
-    logFn = () => Log.i(bail("bailing here"));
+    logFn = () => Log.t(bail("bailing here trace"));
     func(logFn, 4);
   });
 
   test('test-anyhow2', () {
-    final current = StackTrace.current;
-    logFn = () => Log.i(bail("bailing here"), objStackTrace: current);
+    logFn = () => Log.d(bail("bailing here debug"));
     func(logFn, 4);
   });
 
   test('test-anyhow3', () {
     Error.displayFormat = ErrDisplayFormat.rootCauseFirst;
-    logFn = () => Log.i(bail("bailing here"));
+    logFn = () => Log.w(bail("bailing here warning"));
     func(logFn, 9);
   });
 

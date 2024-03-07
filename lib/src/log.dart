@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:anyhow/anyhow.dart' as anyhow;
 import 'package:rewind/src/output/console_output.dart';
 import 'package:rewind/src/printers/printer.dart';
+import 'package:rewind/src/utils.dart';
 import 'package:rust_core/iter.dart';
 import 'package:stack_trace/stack_trace.dart';
 import 'package:uuid/uuid.dart';
@@ -26,95 +27,108 @@ class Log {
 
   static Level level = Level.info;
   static LogOutput output = ConsoleOutput();
+
+  static LogLevelConfig defaultLogConfig = LogLevelConfig.def(
+    printer: PrettyPrinter(),
+  );
+  static LogLevelConfig traceLogConfig = defaultLogConfig;
   static LogLevelConfig debugLogConfig = defaultLogConfig;
   static LogLevelConfig infoLogConfig = defaultLogConfig;
   static LogLevelConfig warningLogConfig = defaultLogConfig;
   static LogLevelConfig errorLogConfig = defaultLogConfig;
+  static LogLevelConfig fatalLogConfig = defaultLogConfig;
 
   static final _uuid = Uuid();
 
-
   //************************************************************************//
-
-  /// debug. See class description on how to use logging levels correctly.
+  
+  /// trace.
+  ///
   /// {@template Logging.levelParams}
-  /// @param [obj], object to log, can be anything - String, Exception, etc. If type [_LazyFunction], it gets executed
+  /// @param [obj], object to log, can be anything - String, Exception, etc. If type [Function()], it gets executed
   /// and result is the new [obj]
-  /// @param [override], logs the original object type and stacktrace if it exists, but overrides the [obj]s [toString()]
-  /// @param [append], appends the message on a new line to message from obj or messageOverride
-  /// @param [objStackTrace], stacktrace associated with the [obj]. If [obj] is already an [Error], [anyhow.Err<anyhow.Error>], or [anyhow.Error] the stacktrace is already taken by default.
+  /// @param [override], the original log object is still passed around, but the stringified version of the [obj] is replaced with this.
+  /// @param [append], appends the message to the log entry.
   /// {@endtemplate}
-  static void d(obj,
-      {String? override, String? append, StackTrace? objStackTrace}) {
+  static void t(obj, {String? override, String? append}) {
+    if (level.value <= Level.trace.value) {
+      return _applyObjToLog(Level.trace, obj, override, append, traceLogConfig);
+    }
+  }
+
+  /// debug.
+  ///
+  /// {@macro Logging.levelParams}
+  static void d(obj, {String? override, String? append}) {
     if (level.value <= Level.debug.value) {
       return _applyObjToLog(Level.debug, obj, override, append, debugLogConfig);
     }
   }
 
-  /// info. See class description on how to use logging levels correctly.
+  /// info.
   ///
   /// {@macro Logging.levelParams}
-  static void i(obj,
-      {String? override,
-      String? append,
-      StackTrace? objStackTrace}) {
+  static void i(obj, {String? override, String? append}) {
     if (level.value <= Level.info.value) {
-      return _applyObjToLog(
-          Level.info, obj, override, append, infoLogConfig);
+      return _applyObjToLog(Level.info, obj, override, append, infoLogConfig);
     }
   }
 
-  /// warning. See class description on how to use logging levels correctly.
+  /// warning.
   ///
   /// {@macro Logging.levelParams}
-  static void w(obj,
-      {String? override,
-      String? append,
-      StackTrace? objStackTrace}) {
+  static void w(obj, {String? override, String? append}) {
     if (level.value <= Level.warning.value) {
-      return _applyObjToLog(
-          Level.warning, obj, override, append, warningLogConfig);
+      return _applyObjToLog(Level.warning, obj, override, append, warningLogConfig);
     }
   }
 
-  /// error. See class description on how to use logging levels correctly.
+  /// error.
   ///
   /// {@macro Logging.levelParams}
-  static void e(obj,
-      {String? messageOverride,
-      String? messageAppend,
-      StackTrace? objStackTrace}) {
+  static void e(obj, {String? messageOverride, String? messageAppend}) {
     if (level.value <= Level.error.value) {
-      return _applyObjToLog(
-          Level.error, obj, messageOverride, messageAppend, errorLogConfig);
+      return _applyObjToLog(Level.error, obj, messageOverride, messageAppend, errorLogConfig);
+    }
+  }
+
+  /// fatal.
+  ///
+  /// {@macro Logging.levelParams}
+  static void f(obj, {String? messageOverride, String? messageAppend}) {
+    if (level.value <= Level.fatal.value) {
+      return _applyObjToLog(Level.fatal, obj, messageOverride, messageAppend, fatalLogConfig);
     }
   }
 
   //************************************************************************//
 
-  static void _applyObjToLog(
-      Level level,
-      Object objToLog,
-      String? messageOverride,
-      String? messageAppend,
-      LogLevelConfig logConfig) {
-    
+  static void _applyObjToLog(Level level, Object objToLog, String? messageOverride,
+      String? messageAppend, LogLevelConfig logConfig) {
     String? logId;
-    if(logConfig._willCreateLogId){
+    if (logConfig._willCreateLogId) {
       logId = _uuid.v4();
     }
     DateTime? time;
-    if(logConfig._willCaptureTime){
+    if (logConfig._willCaptureTime) {
       time = DateTime.now().toUtc();
     }
     StackTrace? logPointStackTrace;
-    if(logConfig._willCreateStackTraceForLogPoint){
-      logPointStackTrace = StackTrace.current;
+    if (logConfig._willCreateStackTraceForLogPoint) {
+      logPointStackTrace = modifyStackTrace(StackTrace.current, startOffset: 2);
     }
-    
-    final logEvent = LogEvent(level, objToLog, messageOverride, messageAppend, time, logId, logPointStackTrace);
-    //todo add callback
-    final outputEntries = logConfig.components.iter().map((e) => e.build(logEvent)).filter((e) => e != null).cast<LogField>().toList();
+
+    final logEvent =
+        LogEvent(level, objToLog, messageOverride, messageAppend, time, logId, logPointStackTrace);
+
+    logConfig.onLog?.call(logEvent);
+
+    final outputEntries = logConfig.components
+        .iter()
+        .map((e) => e.build(logEvent))
+        .filter((e) => e != null)
+        .cast<LogField>()
+        .toList();
 
     final formatted = logConfig.printer.format(level, outputEntries, logConfig.framesToKeep);
 
@@ -126,6 +140,7 @@ class Log {
 class LogField {
   final String? header;
   final String? headerMessage;
+
   /// Usually a string, but if not, the printer will handle it
   final Object? body;
 
@@ -141,11 +156,9 @@ class LogEvent {
   final String? id;
   final StackTrace? logPointStackTrace;
 
-  LogEvent(this.level, this.obj, this.override, this.append,
-      this.time, this.id, this.logPointStackTrace);
-
+  LogEvent(this.level, this.obj, this.override, this.append, this.time, this.id,
+      this.logPointStackTrace);
 }
-
 
 enum LogFeature {
   logId,
