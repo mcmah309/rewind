@@ -23,6 +23,7 @@ class LogLevelConfig {
   })  : components = const [
           ObjectTypeComponent(),
           StringifiedComponent(),
+          AssociatedStackTraceComponent(),
           AppendLogComponent(),
           IdComponent(),
           TimeComponent(),
@@ -87,9 +88,8 @@ class ObjectTypeComponent extends LogComponent {
 }
 
 class StringifiedComponent extends LogComponent {
-  final int ifHasStacktraceKeep;
 
-  const StringifiedComponent({this.ifHasStacktraceKeep = 6});
+  const StringifiedComponent();
 
   @override
   LogField build(LogEvent event) {
@@ -99,6 +99,25 @@ class StringifiedComponent extends LogComponent {
     return LogField(
       header: header,
       body: message,
+    );
+  }
+
+  @override
+  List<ToCapture> get toCapture => const [];
+}
+
+class AssociatedStackTraceComponent extends LogComponent {
+
+  const AssociatedStackTraceComponent();
+
+  @override
+  LogField? build(LogEvent event) {
+    if (event.associatedStackTrace == null) {
+      return null;
+    }
+    return LogField(
+      header: 'Associated StackTrace',
+      body: event.associatedStackTrace!,
     );
   }
 
