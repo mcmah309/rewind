@@ -1,5 +1,10 @@
 # Rewind
 
+[![Pub Version](https://img.shields.io/pub/v/rewind.svg)](https://pub.dev/packages/rewind)
+[![Dart Package Docs](https://img.shields.io/badge/documentation-pub.dev-blue.svg)](https://pub.dev/documentation/rewind/latest/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://github.com/mcmah309/rewind/actions/workflows/dart.yml/badge.svg)](https://github.com/mcmah309/rewind/actions)
+
 `rewind` is a logging utility that allows you log anything and at each logging level completely customize what is captured and how your logs look.
 
 click [here](#example-ouput) for an example output.
