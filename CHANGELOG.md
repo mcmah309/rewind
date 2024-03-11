@@ -1,3 +1,8 @@
+# 0.2.0
+
+- Additional components
+- Add documentation
+
 ## 0.1.0
 
 - Working implementation
