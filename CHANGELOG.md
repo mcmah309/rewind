@@ -1,3 +1,7 @@
+# 0.2.1
+
+- Change name
+
 # 0.2.0
 
 - Additional components
