@@ -226,7 +226,7 @@ packages:
     source: hosted
     version: "2.1.4"
   rust_core:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: rust_core
       sha256: "39154cfa64fd4c14b23addd2f8786567b5270c51dd4b6220670348c65254b3ed"
