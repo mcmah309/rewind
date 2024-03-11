@@ -9,14 +9,7 @@ import 'output/output.dart';
 
 part "log_builder.dart";
 
-/// FORMAT:
-/// Object Type
-/// Stringified || Stringified Override
-/// Appended Message || None
-/// Log Id || None
-/// Time || None
-/// Log-Point StackTrace
-/// Object's StackTrace || None
+/// Logging interface.
 class Log {
   Log._();
 
