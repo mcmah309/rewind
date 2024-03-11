@@ -31,7 +31,6 @@ class LogLevelConfig {
         _willCreateLogId = true,
         _willCaptureTime = true,
         _willCreateStackTraceForLogPoint = true;
-                
 
   LogLevelConfig(
       {required this.components,
@@ -94,7 +93,8 @@ class StringifiedComponent extends LogComponent {
 
   @override
   LogField build(LogEvent event) {
-    final header = event.override == null ? 'Stringified' : 'Stringified Override';
+    final header =
+        event.override == null ? 'Stringified' : 'Stringified Override';
     final message = event.override ?? event.obj;
     return LogField(
       header: header,

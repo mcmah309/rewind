@@ -28,12 +28,11 @@ class SimplePrinter implements Printer {
       buffer.add(prefix);
       final entry = entries.first;
       if (entry.body != null) {
-          final String stringBody = _bodyToString(entry.body!, framesToKeep);
-          for (var line in stringBody.split("\n")) {
-            buffer.add(line);
-          }
+        final String stringBody = _bodyToString(entry.body!, framesToKeep);
+        for (var line in stringBody.split("\n")) {
+          buffer.add(line);
         }
-      
+      }
     } else {
       buffer.add(prefix);
       for (var entry in entries) {

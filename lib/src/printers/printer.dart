@@ -11,7 +11,6 @@ part "pretty_printer.dart";
 part "simple_printer.dart";
 
 abstract class Printer {
-
   const Printer();
 
   /// Formats the entries to log and returns a list of strings, which are lines.
@@ -20,7 +19,7 @@ abstract class Printer {
     List<LogField> entries,
     int? framesToKeep,
   );
-} 
+}
 
 String _bodyToString(Object body, int? framesToKeep) {
   if (body is Function()) {
@@ -33,10 +32,12 @@ String _bodyToString(Object body, int? framesToKeep) {
     case anyhow.Error():
       stringBody = _anyhowErrorToString(body, framesToKeep);
     case StackTrace():
-      stringBody = modifyStackTrace(body, numberOfFramesToKeep: framesToKeep).toString();
+      stringBody =
+          modifyStackTrace(body, numberOfFramesToKeep: framesToKeep).toString();
     case Map():
     case Iterable():
-      stringBody = JsonEncoder.withIndent('  ', (e) => e.toString()).convert(body);
+      stringBody =
+          JsonEncoder.withIndent('  ', (e) => e.toString()).convert(body);
     case String():
       stringBody = body;
     default:
@@ -48,7 +49,8 @@ String _bodyToString(Object body, int? framesToKeep) {
 String _anyhowErrorToString(anyhow.Error error, int? framesToKeep) {
   final currentModifyStackTrace = anyhow.Error.stackTraceDisplayModifier;
   anyhow.Error.stackTraceDisplayModifier = (stackTrace) {
-    return modifyStackTrace(stackTrace, numberOfFramesToKeep: framesToKeep, startOffset: 1);
+    return modifyStackTrace(stackTrace,
+        numberOfFramesToKeep: framesToKeep, startOffset: 1);
   };
   final stringBody = error.toString();
   anyhow.Error.stackTraceDisplayModifier = currentModifyStackTrace;

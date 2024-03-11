@@ -3,37 +3,25 @@ import 'package:test/test.dart';
 import 'package:rewind/rewind.dart';
 
 void main() {
-
   Log.level = Level.trace;
-  Log.defaultLogConfig = LogLevelConfig.def(
-    printer: SimplePrinter()
-  );
-  Log.errorLogConfig = LogLevelConfig.def(
-    printer: PrettyPrinter()
-  );
-  Log.warningLogConfig = LogLevelConfig(
-    printer: PrettyPrinter(),
-    components: [
+  Log.defaultLogConfig = LogLevelConfig.def(printer: SimplePrinter());
+  Log.errorLogConfig = LogLevelConfig.def(printer: PrettyPrinter());
+  Log.warningLogConfig = LogLevelConfig(printer: PrettyPrinter(), components: [
     StringifiedComponent(),
   ]);
-  Log.debugLogConfig = LogLevelConfig(
-    printer: SimplePrinter(),
-    components: [
+  Log.debugLogConfig = LogLevelConfig(printer: SimplePrinter(), components: [
     StringifiedComponent(),
   ]);
 
   late void Function() logFn;
 
   test('test1', () {
-    logFn = () => Log.t('test',
-        override: 'override',
-        append: 'append');
+    logFn = () => Log.t('test', override: 'override', append: 'append');
     func(logFn, 4);
   });
 
   test('test2', () {
-    logFn =
-        () => Log.i('test', append: 'append');
+    logFn = () => Log.i('test', append: 'append');
     func(logFn, 4);
   });
 

@@ -36,7 +36,7 @@ class Log {
   static final _uuid = Uuid();
 
   //************************************************************************//
-  
+
   /// trace.
   ///
   /// {@template Logging.levelParams}
@@ -74,7 +74,8 @@ class Log {
   /// {@macro Logging.levelParams}
   static void w(obj, {String? override, String? append}) {
     if (level.value <= Level.warning.value) {
-      return _applyObjToLog(Level.warning, obj, override, append, warningLogConfig);
+      return _applyObjToLog(
+          Level.warning, obj, override, append, warningLogConfig);
     }
   }
 
@@ -83,7 +84,8 @@ class Log {
   /// {@macro Logging.levelParams}
   static void e(obj, {String? messageOverride, String? messageAppend}) {
     if (level.value <= Level.error.value) {
-      return _applyObjToLog(Level.error, obj, messageOverride, messageAppend, errorLogConfig);
+      return _applyObjToLog(
+          Level.error, obj, messageOverride, messageAppend, errorLogConfig);
     }
   }
 
@@ -92,14 +94,19 @@ class Log {
   /// {@macro Logging.levelParams}
   static void f(obj, {String? messageOverride, String? messageAppend}) {
     if (level.value <= Level.fatal.value) {
-      return _applyObjToLog(Level.fatal, obj, messageOverride, messageAppend, fatalLogConfig);
+      return _applyObjToLog(
+          Level.fatal, obj, messageOverride, messageAppend, fatalLogConfig);
     }
   }
 
   //************************************************************************//
 
-  static void _applyObjToLog(Level level, Object objToLog, String? messageOverride,
-      String? messageAppend, LogLevelConfig logConfig) {
+  static void _applyObjToLog(
+      Level level,
+      Object objToLog,
+      String? messageOverride,
+      String? messageAppend,
+      LogLevelConfig logConfig) {
     String? logId;
     if (logConfig._willCreateLogId) {
       logId = _uuid.v4();
@@ -113,8 +120,8 @@ class Log {
       logPointStackTrace = modifyStackTrace(StackTrace.current, startOffset: 2);
     }
 
-    final logEvent =
-        LogEvent(level, objToLog, messageOverride, messageAppend, time, logId, logPointStackTrace);
+    final logEvent = LogEvent(level, objToLog, messageOverride, messageAppend,
+        time, logId, logPointStackTrace);
 
     logConfig.onLog?.call(logEvent);
 
@@ -125,7 +132,8 @@ class Log {
         .cast<LogField>()
         .toList();
 
-    final formatted = logConfig.printer.format(level, outputEntries, logConfig.framesToKeep);
+    final formatted =
+        logConfig.printer.format(level, outputEntries, logConfig.framesToKeep);
 
     output.output(Output(formatted));
   }

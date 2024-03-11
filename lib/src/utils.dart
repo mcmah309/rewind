@@ -8,7 +8,8 @@ StackTrace modifyStackTrace(StackTrace stackTrace,
   List<Frame> frames = trace.frames;
   List<Frame> newFrames = [];
   if (numberOfFramesToKeep != null) {
-    numberOfFramesToKeep = min(numberOfFramesToKeep + startOffset, frames.length);
+    numberOfFramesToKeep =
+        min(numberOfFramesToKeep + startOffset, frames.length);
   } else {
     numberOfFramesToKeep = frames.length;
   }
