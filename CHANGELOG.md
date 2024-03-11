@@ -1,3 +1,7 @@
+# 0.2.2
+
+- Add associated
+
 # 0.2.1
 
 - Change name
