@@ -1,8 +1,8 @@
 # Rewind
 
-`rewind` is a logging utility that allows you completely customize what is captured and how your logs look at each logging level.
+`rewind` is a logging utility that allows you log anything and at each logging level completely customize what is captured and how your logs look.
 
-click [here]() for an example output.
+click [here](#example-ouput) for an example output.
 
 ## How To Use
 ```dart
@@ -14,7 +14,7 @@ Log.w(object, append: "Some more information.")
 Log.e(object, override: "Use this instead.")
 ```
 ## Levels
-See [here]() for when to use each:
+See [here](#logging-guidelines) for when to use each:
 - `t`: trace
 - `d`: debug
 - `i`: info
@@ -51,7 +51,17 @@ Log.level = Level.trace;
   ]);
 ```
 You can create your own custom `components` by extends the `LogComponent` class.
-
+#### Selecting The Output
+By default the output goes to the console. But you can change it for example with:
+```dart
+Log.output = FileOutput(file: File("path/to/file"), overrideExisting: true, encoding: utf8);
+```
+##### Suported Outputs
+- Console
+- File
+- Memory
+- Stream
+- Multiple (combines any of the above)
 
 
 ## Logging Guidelines
@@ -63,8 +73,9 @@ Ever wonder what level to log at? Follow the flow chart below.
 `rewind` is aware of types from the [anyhow]() package. Therefore, when setting `framesToKeep`, rewind will adjust the stack trace display accordingly.
 
 ## Example Ouput
-config:
-```dart
-
-```
-output:
+#### Multiple Components
+![Multiple Components](/assets/1710119359_grim.png)
+#### Single Component
+![Stringified Only Pretty](/assets/1710119342_grim%20(1).png)
+#### Single Component Simple Print
+![Stringified Only Simple](/assets/1710119342_grim.png)
