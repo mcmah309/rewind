@@ -75,20 +75,20 @@ class Log {
   /// error.
   ///
   /// {@macro Logging.levelParams}
-  static void e(obj, {String? messageOverride, String? messageAppend}) {
+  static void e(obj, {String? override, String? append}) {
     if (level.value <= Level.error.value) {
       return _applyObjToLog(
-          Level.error, obj, messageOverride, messageAppend, errorLogConfig);
+          Level.error, obj, override, append, errorLogConfig);
     }
   }
 
   /// fatal.
   ///
   /// {@macro Logging.levelParams}
-  static void f(obj, {String? messageOverride, String? messageAppend}) {
+  static void f(obj, {String? override, String? append}) {
     if (level.value <= Level.fatal.value) {
       return _applyObjToLog(
-          Level.fatal, obj, messageOverride, messageAppend, fatalLogConfig);
+          Level.fatal, obj, override, append, fatalLogConfig);
     }
   }
 
