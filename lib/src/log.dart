@@ -39,34 +39,41 @@ class Log {
   /// @param [append], appends the message to the log entry.
   /// @param [associated], a [StackTrace] associated with the object. Usually not directly available from the object.
   /// {@endtemplate}
-  static void t(obj, {String? override, String? append, StackTrace? associated}) {
+  static void t(obj,
+      {String? override, String? append, StackTrace? associated}) {
     if (level.value <= Level.trace.value) {
-      return _applyObjToLog(Level.trace, obj, override, append, associated, traceLogConfig);
+      return _applyObjToLog(
+          Level.trace, obj, override, append, associated, traceLogConfig);
     }
   }
 
   /// debug.
   ///
   /// {@macro Logging.levelParams}
-  static void d(obj, {String? override, String? append, StackTrace? associated}) {
+  static void d(obj,
+      {String? override, String? append, StackTrace? associated}) {
     if (level.value <= Level.debug.value) {
-      return _applyObjToLog(Level.debug, obj, override, append, associated, debugLogConfig);
+      return _applyObjToLog(
+          Level.debug, obj, override, append, associated, debugLogConfig);
     }
   }
 
   /// info.
   ///
   /// {@macro Logging.levelParams}
-  static void i(obj, {String? override, String? append, StackTrace? associated}) {
+  static void i(obj,
+      {String? override, String? append, StackTrace? associated}) {
     if (level.value <= Level.info.value) {
-      return _applyObjToLog(Level.info, obj, override, append, associated, infoLogConfig);
+      return _applyObjToLog(
+          Level.info, obj, override, append, associated, infoLogConfig);
     }
   }
 
   /// warning.
   ///
   /// {@macro Logging.levelParams}
-  static void w(obj, {String? override, String? append, StackTrace? associated}) {
+  static void w(obj,
+      {String? override, String? append, StackTrace? associated}) {
     if (level.value <= Level.warning.value) {
       return _applyObjToLog(
           Level.warning, obj, override, append, associated, warningLogConfig);
@@ -76,7 +83,8 @@ class Log {
   /// error.
   ///
   /// {@macro Logging.levelParams}
-  static void e(obj, {String? override, String? append, StackTrace? associated}) {
+  static void e(obj,
+      {String? override, String? append, StackTrace? associated}) {
     if (level.value <= Level.error.value) {
       return _applyObjToLog(
           Level.error, obj, override, append, associated, errorLogConfig);
@@ -86,7 +94,8 @@ class Log {
   /// fatal.
   ///
   /// {@macro Logging.levelParams}
-  static void f(obj, {String? override, String? append, StackTrace? associated}) {
+  static void f(obj,
+      {String? override, String? append, StackTrace? associated}) {
     if (level.value <= Level.fatal.value) {
       return _applyObjToLog(
           Level.fatal, obj, override, append, associated, fatalLogConfig);
@@ -115,8 +124,8 @@ class Log {
       logPointStackTrace = modifyStackTrace(StackTrace.current, startOffset: 2);
     }
 
-    final logEvent = LogEvent(level, objToLog, messageOverride, messageAppend, associatedStackTrace,
-        time, logId, logPointStackTrace);
+    final logEvent = LogEvent(level, objToLog, messageOverride, messageAppend,
+        associatedStackTrace, time, logId, logPointStackTrace);
 
     logConfig.onLog?.call(logEvent);
 
@@ -155,8 +164,8 @@ class LogEvent {
   final String? id;
   final StackTrace? logPointStackTrace;
 
-  LogEvent(this.level, this.obj, this.override, this.append, this.associatedStackTrace, this.time, this.id,
-      this.logPointStackTrace);
+  LogEvent(this.level, this.obj, this.override, this.append,
+      this.associatedStackTrace, this.time, this.id, this.logPointStackTrace);
 }
 
 enum LogFeature {

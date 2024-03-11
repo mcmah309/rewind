@@ -88,7 +88,6 @@ class ObjectTypeComponent extends LogComponent {
 }
 
 class StringifiedComponent extends LogComponent {
-
   const StringifiedComponent();
 
   @override
@@ -107,7 +106,6 @@ class StringifiedComponent extends LogComponent {
 }
 
 class AssociatedStackTraceComponent extends LogComponent {
-
   const AssociatedStackTraceComponent();
 
   @override
