@@ -5,7 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://github.com/mcmah309/rewind/actions/workflows/dart.yml/badge.svg)](https://github.com/mcmah309/rewind/actions)
 
-`rewind` is a logging utility that allows you log anything and at each logging level completely customize what is captured and how your logs look.
+
+`rewind` is a logging tool that enables you to record any data, with full customization of what is captured and the appearance of your logs at every logging level.
 
 click [here](#example-ouput) for an example output.
 

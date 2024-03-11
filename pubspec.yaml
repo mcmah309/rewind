@@ -1,5 +1,5 @@
 name: rewind
-description: Logging utility.
+description: A logging tool that enables you to record any data, with full customization of what is captured and the appearance of your logs at every logging level.
 version: 0.2.0
 repository: https://github.com/mcmah309/anyhow_logging
 
