@@ -1,8 +1,5 @@
 import 'dart:convert';
-import 'dart:math';
 
-import 'package:anyhow/base.dart';
-import 'package:stack_trace/stack_trace.dart';
 import 'package:anyhow/anyhow.dart' as anyhow;
 
 import '../ansi_color.dart';

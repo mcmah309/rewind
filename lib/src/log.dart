@@ -1,12 +1,7 @@
-import 'dart:convert';
-import 'dart:math';
-
-import 'package:anyhow/anyhow.dart' as anyhow;
 import 'package:rewind/src/output/console_output.dart';
 import 'package:rewind/src/printers/printer.dart';
 import 'package:rewind/src/utils.dart';
 import 'package:rust_core/iter.dart';
-import 'package:stack_trace/stack_trace.dart';
 import 'package:uuid/uuid.dart';
 
 import 'level.dart';
