@@ -164,8 +164,8 @@ class LogEvent {
   final String? id;
   final StackTrace? logPointStackTrace;
 
-  LogEvent(this.level, this.obj, this.override, this.append,
-      this.stackTrace, this.time, this.id, this.logPointStackTrace);
+  LogEvent(this.level, this.obj, this.override, this.append, this.stackTrace,
+      this.time, this.id, this.logPointStackTrace);
 }
 
 enum LogFeature {

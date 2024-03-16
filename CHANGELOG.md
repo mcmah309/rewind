@@ -1,3 +1,7 @@
+# 0.3
+
+- Change associated to stackTrace
+
 # 0.2.2
 
 - Add associated
