@@ -18,13 +18,13 @@ void main() {
   test('test1', () {
     final current = StackTrace.current;
     logFn = () => Log.t('test',
-        override: 'override', append: 'append', associated: current);
+        override: 'override', append: 'append', stackTrace: current);
     func(logFn, 4);
   });
 
   test('test2', () {
     final current = StackTrace.current;
-    logFn = () => Log.i('test', append: 'append', associated: current);
+    logFn = () => Log.i('test', append: 'append', stackTrace: current);
     func(logFn, 4);
   });
 
@@ -40,7 +40,7 @@ void main() {
 
   test('test-anyhow1', () {
     logFn =
-        () => Log.t(bail("bailing here trace"), associated: StackTrace.current);
+        () => Log.t(bail("bailing here trace"), stackTrace: StackTrace.current);
     func(logFn, 4);
   });
 

@@ -37,13 +37,13 @@ class Log {
   /// and result is the new [obj]
   /// @param [override], the original log object is still passed around, but the stringified version of the [obj] is replaced with this.
   /// @param [append], appends the message to the log entry.
-  /// @param [associated], a [StackTrace] associated with the object. Usually not directly available from the object.
+  /// @param [stackTrace], a [StackTrace] associated with the object. Usually not directly available from the object.
   /// {@endtemplate}
   static void t(obj,
-      {String? override, String? append, StackTrace? associated}) {
+      {String? override, String? append, StackTrace? stackTrace}) {
     if (level.value <= Level.trace.value) {
       return _applyObjToLog(
-          Level.trace, obj, override, append, associated, traceLogConfig);
+          Level.trace, obj, override, append, stackTrace, traceLogConfig);
     }
   }
 
@@ -51,10 +51,10 @@ class Log {
   ///
   /// {@macro Logging.levelParams}
   static void d(obj,
-      {String? override, String? append, StackTrace? associated}) {
+      {String? override, String? append, StackTrace? stackTrace}) {
     if (level.value <= Level.debug.value) {
       return _applyObjToLog(
-          Level.debug, obj, override, append, associated, debugLogConfig);
+          Level.debug, obj, override, append, stackTrace, debugLogConfig);
     }
   }
 
@@ -62,10 +62,10 @@ class Log {
   ///
   /// {@macro Logging.levelParams}
   static void i(obj,
-      {String? override, String? append, StackTrace? associated}) {
+      {String? override, String? append, StackTrace? stackTrace}) {
     if (level.value <= Level.info.value) {
       return _applyObjToLog(
-          Level.info, obj, override, append, associated, infoLogConfig);
+          Level.info, obj, override, append, stackTrace, infoLogConfig);
     }
   }
 
@@ -73,10 +73,10 @@ class Log {
   ///
   /// {@macro Logging.levelParams}
   static void w(obj,
-      {String? override, String? append, StackTrace? associated}) {
+      {String? override, String? append, StackTrace? stackTrace}) {
     if (level.value <= Level.warning.value) {
       return _applyObjToLog(
-          Level.warning, obj, override, append, associated, warningLogConfig);
+          Level.warning, obj, override, append, stackTrace, warningLogConfig);
     }
   }
 
@@ -84,10 +84,10 @@ class Log {
   ///
   /// {@macro Logging.levelParams}
   static void e(obj,
-      {String? override, String? append, StackTrace? associated}) {
+      {String? override, String? append, StackTrace? stackTrace}) {
     if (level.value <= Level.error.value) {
       return _applyObjToLog(
-          Level.error, obj, override, append, associated, errorLogConfig);
+          Level.error, obj, override, append, stackTrace, errorLogConfig);
     }
   }
 
@@ -95,10 +95,10 @@ class Log {
   ///
   /// {@macro Logging.levelParams}
   static void f(obj,
-      {String? override, String? append, StackTrace? associated}) {
+      {String? override, String? append, StackTrace? stackTrace}) {
     if (level.value <= Level.fatal.value) {
       return _applyObjToLog(
-          Level.fatal, obj, override, append, associated, fatalLogConfig);
+          Level.fatal, obj, override, append, stackTrace, fatalLogConfig);
     }
   }
 
@@ -109,7 +109,7 @@ class Log {
       Object objToLog,
       String? messageOverride,
       String? messageAppend,
-      StackTrace? associatedStackTrace,
+      StackTrace? stackTrace,
       LogLevelConfig logConfig) {
     String? logId;
     if (logConfig._willCreateLogId) {
@@ -125,7 +125,7 @@ class Log {
     }
 
     final logEvent = LogEvent(level, objToLog, messageOverride, messageAppend,
-        associatedStackTrace, time, logId, logPointStackTrace);
+        stackTrace, time, logId, logPointStackTrace);
 
     logConfig.onLog?.call(logEvent);
 
@@ -159,13 +159,13 @@ class LogEvent {
   final Object obj;
   final String? override;
   final String? append;
-  final StackTrace? associatedStackTrace;
+  final StackTrace? stackTrace;
   final DateTime? time;
   final String? id;
   final StackTrace? logPointStackTrace;
 
   LogEvent(this.level, this.obj, this.override, this.append,
-      this.associatedStackTrace, this.time, this.id, this.logPointStackTrace);
+      this.stackTrace, this.time, this.id, this.logPointStackTrace);
 }
 
 enum LogFeature {

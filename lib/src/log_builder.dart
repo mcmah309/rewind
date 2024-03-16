@@ -110,12 +110,12 @@ class AssociatedStackTraceComponent extends LogComponent {
 
   @override
   LogField? build(LogEvent event) {
-    if (event.associatedStackTrace == null) {
+    if (event.stackTrace == null) {
       return null;
     }
     return LogField(
       header: 'Associated StackTrace',
-      body: event.associatedStackTrace!,
+      body: event.stackTrace!,
     );
   }
 
