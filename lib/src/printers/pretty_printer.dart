@@ -10,21 +10,21 @@ class PrettyPrinter implements Printer {
   static const singleDivider = '┄';
 
   static final Map<Level, String> defaultLevelEmojis = {
-    Level.trace: '',
-    Level.debug: '🐛',
+    Level.trace: '👾',
+    Level.debug: '🐞',
     Level.info: '💡',
     Level.warning: '⚠️',
     Level.error: '⛔',
-    Level.fatal: '👾',
+    Level.fatal: '💀',
   };
 
   static final Map<Level, AnsiColor> defaultLevelColors = {
-    //Level.trace: AnsiColor(54), // purple
+    Level.trace: AnsiColor(54), // purple
     Level.debug: const AnsiColor(82), // green
     Level.info: const AnsiColor(12), // blue
     Level.warning: const AnsiColor(208), // orange
     Level.error: const AnsiColor(124), // red
-    //Level.fatal: const AnsiColor(199), // bright red
+    Level.fatal: const AnsiColor(199), // bright red
   };
 
   /// Controls the length of the divider lines.
