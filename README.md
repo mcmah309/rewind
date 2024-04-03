@@ -12,13 +12,21 @@ click [here](#example-ouput) for an example output.
 
 ## How To Use
 ```dart
+// set log level
+Log.level = Level.info;
 // log info
-Log.i(object)
-// log warning with additional message
-Log.w(object, append: "Some more information.")
-// log error overriding the string verion of the object
-Log.e(object, override: "Use this instead.")
+Log.i(object);
+// log info with additional message
+Log.i(object, append: "Some more information.");
+// log info overriding the string verion of the object
+Log.i(object, override: "Use this instead.");
+// log info with a stactrace related to the log object.
+// Note: No need to ever do `StackTrace.current` since that is taken 
+// care of if you include the `LogPointComponent()` in your config
+Log.i(object, stackTrace: stackTrace);
 ```
+Since nothing will ever be logged unless `Log.level` is set, `rewind` is safe to use packages.
+
 ## Levels
 See [here](#logging-guidelines) for when to use each:
 - `t`: trace
@@ -44,19 +52,26 @@ Log.level = Level.trace;
   );
   Log.errorLogConfig = LogLevelConfig(
     printer: PrettyPrinter(),
-    // the number of frames to keep if a stacktrace is present.
+    // the number of frames to keep if a stack trace is present.
     framesToKeep: 10,
     // components to be a part of the log
     components: [
+        // Includes the Object runtime type
         ObjectTypeComponent(),
+        // Stringifies the Object
         StringifiedComponent(),
+        // Includes any appended messages
         AppendLogComponent(),
+        // Creates a unique id for the log you can reference in the ui and/or intercept
         IdComponent(),
+        // Captures the time at which the log occurred
         TimeComponent(),
+        // Captures the stack trace at the point log was called
         LogPointComponent(),
   ]);
 ```
 You can create your own custom `components` by extends the `LogComponent` class.
+
 #### Selecting The Output
 By default the output goes to the console. But you can change it for example with:
 ```dart

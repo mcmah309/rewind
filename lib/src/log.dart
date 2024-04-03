@@ -13,7 +13,7 @@ part "log_builder.dart";
 class Log {
   Log._();
 
-  static Level level = Level.info;
+  static Level? level;
   static LogOutput output = ConsoleOutput();
 
   static LogLevelConfig defaultLogConfig = LogLevelConfig.def(
@@ -41,7 +41,7 @@ class Log {
   /// {@endtemplate}
   static void t(obj,
       {String? override, String? append, StackTrace? stackTrace}) {
-    if (level.value <= Level.trace.value) {
+    if (level != null && level!.value <= Level.trace.value) {
       return _applyObjToLog(
           Level.trace, obj, override, append, stackTrace, traceLogConfig);
     }
@@ -52,7 +52,7 @@ class Log {
   /// {@macro Logging.levelParams}
   static void d(obj,
       {String? override, String? append, StackTrace? stackTrace}) {
-    if (level.value <= Level.debug.value) {
+    if (level != null && level!.value <= Level.debug.value) {
       return _applyObjToLog(
           Level.debug, obj, override, append, stackTrace, debugLogConfig);
     }
@@ -63,7 +63,7 @@ class Log {
   /// {@macro Logging.levelParams}
   static void i(obj,
       {String? override, String? append, StackTrace? stackTrace}) {
-    if (level.value <= Level.info.value) {
+    if (level != null && level!.value <= Level.info.value) {
       return _applyObjToLog(
           Level.info, obj, override, append, stackTrace, infoLogConfig);
     }
@@ -74,7 +74,7 @@ class Log {
   /// {@macro Logging.levelParams}
   static void w(obj,
       {String? override, String? append, StackTrace? stackTrace}) {
-    if (level.value <= Level.warning.value) {
+    if (level != null && level!.value <= Level.warning.value) {
       return _applyObjToLog(
           Level.warning, obj, override, append, stackTrace, warningLogConfig);
     }
@@ -85,7 +85,7 @@ class Log {
   /// {@macro Logging.levelParams}
   static void e(obj,
       {String? override, String? append, StackTrace? stackTrace}) {
-    if (level.value <= Level.error.value) {
+    if (level != null && level!.value <= Level.error.value) {
       return _applyObjToLog(
           Level.error, obj, override, append, stackTrace, errorLogConfig);
     }
@@ -96,7 +96,7 @@ class Log {
   /// {@macro Logging.levelParams}
   static void f(obj,
       {String? override, String? append, StackTrace? stackTrace}) {
-    if (level.value <= Level.fatal.value) {
+    if (level != null && level!.value <= Level.fatal.value) {
       return _applyObjToLog(
           Level.fatal, obj, override, append, stackTrace, fatalLogConfig);
     }
