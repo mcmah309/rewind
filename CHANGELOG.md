@@ -1,4 +1,8 @@
-# 0.3
+# 0.3.1
+
+- Update `rust_core`
+
+# 0.3.0
 
 - Change associated to stackTrace
 
