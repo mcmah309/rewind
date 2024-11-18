@@ -1,3 +1,7 @@
+# 0.3.2
+
+- Remove rust_core dependency
+
 # 0.3.1
 
 - Update `rust_core`

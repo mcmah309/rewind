@@ -1,7 +1,6 @@
 import 'package:rewind/src/output/console_output.dart';
 import 'package:rewind/src/printers/printer.dart';
 import 'package:rewind/src/utils.dart';
-import 'package:rust_core/iter.dart';
 import 'package:uuid/uuid.dart';
 
 import 'level.dart';
@@ -130,9 +129,8 @@ class Log {
     logConfig.onLog?.call(logEvent);
 
     final outputEntries = logConfig.components
-        .iter()
         .map((e) => e.build(logEvent))
-        .filter((e) => e != null)
+        .where((e) => e != null)
         .cast<LogField>()
         .toList();
 

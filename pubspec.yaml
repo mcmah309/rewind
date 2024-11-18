@@ -1,6 +1,6 @@
 name: rewind
 description: A logging tool that enables you to record any data, with full customization of what is captured and the appearance of your logs at every logging level.
-version: 0.3.1
+version: 0.3.2
 repository: https://github.com/mcmah309/anyhow_logging
 
 environment:
@@ -9,7 +9,6 @@ environment:
 # Add regular dependencies here.
 dependencies:
   anyhow: ^1.3.1
-  rust_core: ^1.0.0
   stack_trace: ^1.11.1
   uuid: ^4.3.3
 
