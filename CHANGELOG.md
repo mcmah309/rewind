@@ -1,3 +1,7 @@
+# 0.3.4
+
+- Doc update
+
 # 0.3.3
 
 - Update `anyhow`

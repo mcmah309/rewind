@@ -91,7 +91,7 @@ Ever wonder what level to log at? Follow the flow chart below.
 
 
 ## anyhow
-`rewind` is aware of types from the [anyhow]() package. Therefore, when setting `framesToKeep`, rewind will adjust the stack trace display accordingly.
+`rewind` is aware of types from the [anyhow](https://pub.dev/packages/anyhow) package. Therefore, when setting `framesToKeep`, rewind will adjust the stack trace display accordingly.
 
 ## Example Ouput
 #### Multiple Components
