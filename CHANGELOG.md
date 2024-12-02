@@ -1,3 +1,7 @@
+# 0.3.3
+
+- Update `anyhow`
+
 # 0.3.2
 
 - Remove rust_core dependency

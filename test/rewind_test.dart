@@ -50,7 +50,7 @@ void main() {
   });
 
   test('test-anyhow3', () {
-    Error.displayFormat = ErrDisplayFormat.rootCauseFirst;
+    Error.displayOrder = ErrorDisplayOrder.rootFirst;
     logFn = () => Log.w(bail("bailing here warning"));
     func(logFn, 9);
   });
