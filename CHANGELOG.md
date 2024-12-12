@@ -1,3 +1,7 @@
+# 0.3.5
+
+- Update `anyhow`
+
 # 0.3.4
 
 - Doc update

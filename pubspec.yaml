@@ -1,14 +1,14 @@
 name: rewind
 description: A logging tool that enables you to record any data, with full customization of what is captured and the appearance of your logs at every logging level.
-version: 0.3.4
+version: 0.3.5
 repository: https://github.com/mcmah309/anyhow_logging
 
 environment:
-  sdk: ^3.2.0
+  sdk: ^3.3.0
 
 # Add regular dependencies here.
 dependencies:
-  anyhow: ^2.0.0
+  anyhow: ^3.0.0
   stack_trace: ^1.11.1
   uuid: ^4.3.3
 

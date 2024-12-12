@@ -27,8 +27,8 @@ String _bodyToString(Object body, int? framesToKeep) {
   }
   final String stringBody;
   switch (body) {
-    case anyhow.Err():
-      stringBody = _anyhowErrorToString(body.err, framesToKeep);
+    case anyhow.Err(:final v):
+      stringBody = _anyhowErrorToString(v, framesToKeep);
     case anyhow.Error():
       stringBody = _anyhowErrorToString(body, framesToKeep);
     case StackTrace():
